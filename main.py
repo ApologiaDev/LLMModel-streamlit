@@ -2,6 +2,7 @@
 import json
 import os
 from zipfile import ZipFile
+import tempfile
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -21,14 +22,13 @@ os.environ['HUGGINGFACEHUB_API_TOKEN'] = os.getenv('HUGGINGFACEHUB_API_TOKEN')
 uploaded_model_file = st.file_uploader('Choose a model file (.zip)')
 if uploaded_model_file is not None:
     # initialize context
+    modeltmpdir = tempfile.mkdtemp()
     with ZipFile(uploaded_model_file, 'r') as zip_ref:
-        if not os.path.isdir('model'):
-            os.makedirs('model')
-        zip_ref.extractall('model')
-    config = json.load(open(os.path.join('model', 'config.json'), 'r'))
+        zip_ref.extractall(modeltmpdir)
+    config = json.load(open(os.path.join(modeltmpdir, 'config.json'), 'r'))
     llm = get_llm_model(config)
     embedding = get_embedding_model(config)
-    db = FAISS.load_local('model', embedding)
+    db = FAISS.load_local(modeltmpdir, embedding)
     retriever = db.as_retriever()
     qa = RetrievalQA.from_chain_type(
             llm=llm,
