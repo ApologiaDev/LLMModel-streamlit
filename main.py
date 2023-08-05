@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
-from util.modelhelpers import get_llm_model, get_embedding_model
+from util.modelhelpers import get_llm_model, get_embeddings_model
 
 
 # load environment variables from .env
@@ -27,7 +27,7 @@ if uploaded_model_file is not None:
         zip_ref.extractall(modeltmpdir)
     config = json.load(open(os.path.join(modeltmpdir, 'config.json'), 'r'))
     llm = get_llm_model(config)
-    embedding = get_embedding_model(config)
+    embedding = get_embeddings_model(config)
     db = FAISS.load_local(modeltmpdir, embedding)
     retriever = db.as_retriever()
     qa = RetrievalQA.from_chain_type(
