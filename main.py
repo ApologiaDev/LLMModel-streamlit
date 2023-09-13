@@ -5,7 +5,6 @@ from zipfile import ZipFile
 import tempfile
 
 import streamlit as st
-from dotenv import load_dotenv
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
@@ -13,9 +12,11 @@ from util.modelhelpers import get_llm_model, get_embeddings_model
 
 
 # load environment variables from .env
-load_dotenv()
-os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-os.environ['HUGGINGFACEHUB_API_TOKEN'] = os.getenv('HUGGINGFACEHUB_API_TOKEN')
+st.text('Enter necessary key: ')
+open_ai_key = st.text_input('OpenAI Key', type='password')
+huggingface_api_key = st.text_input('Huggingface API Key', type='password')
+os.environ['OPENAI_API_KEY'] = open_ai_key
+os.environ['HUGGINGFACEHUB_API_TOKEN'] = huggingface_api_key
 
 
 # page
