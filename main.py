@@ -5,17 +5,18 @@ from zipfile import ZipFile
 import tempfile
 
 import streamlit as st
-from dotenv import load_dotenv
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
-from util.modelhelpers import get_llm_model, get_embedding_model
+from util.modelhelpers import get_llm_model, get_embeddings_model
 
 
 # load environment variables from .env
-load_dotenv()
-os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-os.environ['HUGGINGFACEHUB_API_TOKEN'] = os.getenv('HUGGINGFACEHUB_API_TOKEN')
+st.text('Enter necessary key: ')
+open_ai_key = st.text_input('OpenAI Key', type='password')
+huggingface_api_key = st.text_input('Huggingface API Key', type='password')
+os.environ['OPENAI_API_KEY'] = open_ai_key
+os.environ['HUGGINGFACEHUB_API_TOKEN'] = huggingface_api_key
 
 
 # page
@@ -27,7 +28,7 @@ if uploaded_model_file is not None:
         zip_ref.extractall(modeltmpdir)
     config = json.load(open(os.path.join(modeltmpdir, 'config.json'), 'r'))
     llm = get_llm_model(config)
-    embedding = get_embedding_model(config)
+    embedding = get_embeddings_model(config)
     db = FAISS.load_local(modeltmpdir, embedding)
     retriever = db.as_retriever()
     qa = RetrievalQA.from_chain_type(
